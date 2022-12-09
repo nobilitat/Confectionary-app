@@ -1,1 +1,1 @@
-# Confectionary-app
+# Confectionery-app
