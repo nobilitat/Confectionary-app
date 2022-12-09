@@ -16,7 +16,9 @@ class ConnectDialogWindow(QtWidgets.QDialog):
         self.login_input = QtWidgets.QLineEdit()
         self.password_input = QtWidgets.QLineEdit()
         self.login_input.setPlaceholderText('Логин')
+        self.login_input.setStyleSheet('QLineEdit::hover { border: none }')
         self.password_input.setPlaceholderText('Пароль')
+        self.password_input.setStyleSheet('QLineEdit::hover { border: none }')
         self.password_input.setEchoMode(QtWidgets.QLineEdit.Password)
 
         self.error_label = QtWidgets.QLabel()
