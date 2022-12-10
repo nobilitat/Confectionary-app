@@ -2,83 +2,8 @@ import sys
 from PySide6 import QtCore, QtWidgets, QtGui
 from ConnectToDatabase import ConnectToDatabase
 from ConnectDialogWindow import ConnectDialogWindow
-
-
-SUCCESS_CONNECT = False
-
-
-class AddRawWindow(QtWidgets.QWidget):
-    """Окно добавления сырья"""
-
-    def __init__(self):
-        super(AddRawWindow, self).__init__()
-
-        self.resize(350, 130)
-        self.setWindowTitle('Добавление нового сырья')
-
-        self.title = QtWidgets.QLabel('Добавление нового сырья')
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.title)
-
-
-class AddSupplierWindow(QtWidgets.QWidget):
-    """Окно добавления поставщика"""
-
-    def __init__(self, connect):
-        super(AddSupplierWindow, self).__init__()
-
-        self.resize(350, 130)
-        self.setWindowTitle('Добавление нового поставщика')
-        self.connect = connect
-
-        self.validation_field = QtWidgets.QLabel()
-        self.validation_field.setStyleSheet("color: red;")
-
-        self.title = QtWidgets.QLabel('Добавление нового поставщика')
-        self.name = QtWidgets.QLineEdit()
-        self.name.setStyleSheet('QLineEdit::hover { border: none }')
-        self.name.setPlaceholderText('Наименование')
-        self.address = QtWidgets.QLineEdit()
-        self.address.setStyleSheet('QLineEdit::hover { border: none }')
-        self.address.setPlaceholderText('Адрес')
-        self.phone = QtWidgets.QLineEdit()
-        self.phone.setStyleSheet('QLineEdit::hover { border: none }')
-        self.phone.setPlaceholderText('Номер телефона')
-        self.button = QtWidgets.QPushButton('Добавить')
-        self.button.clicked.connect(self.add_supplier)
-
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.title)
-        self.layout.addWidget(self.validation_field)
-        self.layout.addWidget(self.name)
-        self.layout.addWidget(self.address)
-        self.layout.addWidget(self.phone)
-        self.layout.addWidget(self.button)
-
-    def add_supplier(self):
-        name = self.name.text()
-        phone = self.phone.text()
-        address = self.address.text()
-
-        if not name or not phone or not address:
-            self.validation_field.setText('Не все поля заполнены')
-            return
-
-        request = f"""
-            insert into supplier
-            (supplier_name, supplier_address, supplier_phone)
-            values
-            ('{name}', '{address}', '{phone}')
-        """
-
-        if self.connect:
-            cursor = self.connect.cursor()
-            cursor.execute(request)
-            self.connect.commit()
-            cursor.close()
-            self.close()
-        else:
-            print('Нет соедниния с базой данных')
+from AddSupplierWindow import AddSupplierWindow
+from AddRawWindow import AddRawWindow
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -95,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.resize(900, 600)
         self.setWindowTitle('Кондитерское производство')
 
-        font = QtGui.QFont('times', 10)
+        self.font = QtGui.QFont('times', 10)
 
         # Describe menu actions
         new_supply = QtGui.QAction('Новая поставка', self)
@@ -115,9 +40,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # create menuBar and add actions to menu
         menu = self.menuBar()
-        menu.setFont(font)
+        menu.setFont(self.font)
         menu_supply = menu.addMenu('Поставка сырья')
-        menu_supply.setFont(font)
+        menu_supply.setFont(self.font)
         menu_supply.addAction(new_supply)
         menu_supply.addAction(show_supplies)
         menu_supply.addAction(new_raw)
@@ -125,13 +50,13 @@ class MainWindow(QtWidgets.QMainWindow):
         menu_supply.addAction(new_supplier)
         menu_supply.addAction(show_supplier)
         menu_production = menu.addMenu('Производство')
-        menu_production.setFont(font)
+        menu_production.setFont(self.font)
         menu_production.addAction(new_production)
         menu_production.addAction(show_productions)
         menu_production.addAction(new_product)
         menu_production.addAction(show_product)
         menu_order = menu.addMenu('Заказы')
-        menu_order.setFont(font)
+        menu_order.setFont(self.font)
         menu_order.addAction(new_order)
         menu_order.addAction(show_order)
 
@@ -157,8 +82,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """Переопределение метода события вызываемого при закрытии окна"""
         if event.spontaneous():
             msg_box = QtWidgets.QMessageBox()
+            msg_box.setFont(QtGui.QFont('times', 10))
             msg_box.setWindowTitle('Выход из программы')
-            msg_box.setText('Вы уверены, что хотите выйти из программы')
+            msg_box.setText('Вы уверены, что хотите выйти из программы?')
             msg_box.addButton('Да', QtWidgets.QMessageBox.ButtonRole.YesRole)
             msg_box.addButton('Нет', QtWidgets.QMessageBox.ButtonRole.NoRole)
             result = msg_box.exec()
@@ -177,7 +103,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def add_new_raw(self):
         """Вызов окна добавления сырья"""
 
-        self.add_raw = AddRawWindow()
+        self.add_raw = AddRawWindow(self.connect)
+        units = get_units(self.connect)
+        for i in units:
+            self.add_raw.unit.addItems(i)
+
         self.add_raw.show()
 
     @QtCore.Slot()
@@ -186,6 +116,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.add_supplier = AddSupplierWindow(self.connect)
         self.add_supplier.show()
+
+
+def get_units(connect):
+    """Получение единиц измерения"""
+
+    cursor = connect.cursor()
+    cursor.execute("""
+        select unit_name from unit
+    """)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
 
 
 def confectionary():

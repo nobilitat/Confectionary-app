@@ -46,8 +46,9 @@ class ConnectDialogWindow(QtWidgets.QDialog):
         """Переопределение метода события вызываемого при закрытии окна"""
         if event.spontaneous():
             msg_box = QtWidgets.QMessageBox()
+            msg_box.setFont(QtGui.QFont('times', 10))
             msg_box.setWindowTitle('Выход из программы')
-            msg_box.setText('Вы уверены, что хотите выйти из программы')
+            msg_box.setText('Вы уверены, что хотите выйти из программы?')
             msg_box.addButton('Да', QtWidgets.QMessageBox.ButtonRole.YesRole)
             msg_box.addButton('Нет', QtWidgets.QMessageBox.ButtonRole.NoRole)
             result = msg_box.exec()
@@ -69,8 +70,6 @@ class ConnectDialogWindow(QtWidgets.QDialog):
         connect.connect_db()
 
         if connect:
-            global SUCCESS_CONNECT
-            SUCCESS_CONNECT = True
             connect.close()
             self.close()
-            return SUCCESS_CONNECT
+            return True
