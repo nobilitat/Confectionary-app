@@ -8,7 +8,7 @@ class ConnectDialogWindow(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QtGui.QIcon('icon-cake.png'))
+        self.setWindowIcon(QtGui.QIcon('image/icon-cake.png'))
 
         self.resize(450, 110)
         self.setWindowTitle('Подключение к базе данных')
