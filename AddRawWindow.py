@@ -30,6 +30,7 @@ class AddRawWindow(QtWidgets.QWidget):
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.title)
+        self.layout.addWidget(self.validation_field)
         self.layout.addWidget(self.name)
         self.layout.addWidget(self.reserve)
         self.layout.addWidget(self.unit)

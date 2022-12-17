@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from ConnectDialogWindow import ConnectDialogWindow
-from AddSupplierWindow import AddSupplierWindow
+from ShowSupplierWindow import ShowSupplierWindow
 from ShowRawWindow import ShowRawWindow
 
 
@@ -21,13 +21,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.font = QtGui.QFont('times', 10)
 
         # Describe menu actions
-        new_supply = QtGui.QAction('Новая поставка', self)
-        show_supplies = QtGui.QAction('Просмотр поставок', self)
+        show_supplies = QtGui.QAction('Поставки', self)
         show_raws = QtGui.QAction('Сырье', self)
         show_raws.triggered.connect(self.option_raws)
-        new_supplier = QtGui.QAction('Новый поставщик', self)
-        new_supplier.triggered.connect(self.add_new_supplier)
-        show_supplier = QtGui.QAction('Просмотр поставщиков', self)
+        show_supplier = QtGui.QAction('Поставщики', self)
+        show_supplier.triggered.connect(self.option_supplier)
         new_production = QtGui.QAction('Новый выпуск', self)
         show_productions = QtGui.QAction('Просмотр выпусков', self)
         new_product = QtGui.QAction('Новый продукт', self)
@@ -40,10 +38,8 @@ class MainWindow(QtWidgets.QMainWindow):
         menu.setFont(self.font)
         menu_supply = menu.addMenu('Поставка сырья')
         menu_supply.setFont(self.font)
-        menu_supply.addAction(new_supply)
         menu_supply.addAction(show_supplies)
         menu_supply.addAction(show_raws)
-        menu_supply.addAction(new_supplier)
         menu_supply.addAction(show_supplier)
         menu_production = menu.addMenu('Производство')
         menu_production.setFont(self.font)
@@ -57,6 +53,9 @@ class MainWindow(QtWidgets.QMainWindow):
         menu_order.addAction(show_order)
 
         self.title = QtWidgets.QLabel()
+        self.close_button = QtWidgets.QPushButton('Закрыть')
+        self.update_button = QtWidgets.QPushButton('Обновить')
+        self.new_button = QtWidgets.QPushButton('Создать')
 
         # widget for table
         self.widget = QtWidgets.QWidget()
@@ -71,7 +70,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_table = QtWidgets.QTableView()
         self.main_table.setModel(self.model)
 
-        self.main_layout.addWidget(self.title)
+        self.h_layout = QtWidgets.QHBoxLayout(self.widget)
+        self.h_layout.addWidget(self.title)
+        self.h_layout.addStretch()
+        self.h_layout.addWidget(self.new_button)
+        self.h_layout.addWidget(self.update_button)
+        self.h_layout.addWidget(self.close_button)
+
+        self.main_layout.addLayout(self.h_layout)
         self.main_layout.addWidget(self.main_table)
 
     def closeEvent(self, event):
@@ -96,11 +102,12 @@ class MainWindow(QtWidgets.QMainWindow):
         return self.dialog.login_input.text(), self.dialog.password_input.text()
 
     @QtCore.Slot()
-    def add_new_supplier(self):
-        """Вызов окна добавления поставщика"""
+    def option_supplier(self):
+        """Вызов окна просмотра, добавления поставщика"""
 
-        self.add_supplier = AddSupplierWindow(self.connect)
-        self.add_supplier.show()
+        self.show_supplier = ShowSupplierWindow(self.connect)
+        self.show_supplier.show()
+        self.show_supplier.update_getting_supplier()
 
     @QtCore.Slot()
     def option_raws(self):

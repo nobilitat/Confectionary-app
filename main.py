@@ -27,23 +27,19 @@ def confectionary():
         cur.execute(
             '''select 
                 sp.supply_number, 
-                sp.supply_date, 
-                r.raw_name,
+                sp.supply_date,
                 s.supplier_name,
                 sp.supply_sum
             from supply sp
-            inner join supplier s on sp.supplier_id = s.supplier_id
-            inner join supply_raw sr on sr.supply_id = sp.supply_id 
-            inner join raw r on r.raw_id = sr.raw_id;'''
+            inner join supplier s on sp.supplier_id = s.supplier_id;'''
             )
         result = cur.fetchall()
         cur.close()
 
         widget.model.setHorizontalHeaderItem(0, QtGui.QStandardItem('Номер'))
         widget.model.setHorizontalHeaderItem(1, QtGui.QStandardItem('Дата'))
-        widget.model.setHorizontalHeaderItem(2, QtGui.QStandardItem('Наименование сырья'))
-        widget.model.setHorizontalHeaderItem(3, QtGui.QStandardItem('Поставщик'))
-        widget.model.setHorizontalHeaderItem(4, QtGui.QStandardItem('Сумма поставки'))
+        widget.model.setHorizontalHeaderItem(2, QtGui.QStandardItem('Поставщик'))
+        widget.model.setHorizontalHeaderItem(3, QtGui.QStandardItem('Сумма поставки'))
         widget.main_table.verticalHeader().hide()
 
         row_index = 0
@@ -55,14 +51,12 @@ def confectionary():
                     QtGui.QStandardItem(str(i[0])),
                     QtGui.QStandardItem(i[1].strftime("%m/%d/%Y")),
                     QtGui.QStandardItem(str(i[2])),
-                    QtGui.QStandardItem(str(i[3])),
-                    QtGui.QStandardItem(str(i[4]))
+                    QtGui.QStandardItem(str(i[3]))
                  ])
 
         widget.main_table.setColumnWidth(1, 120)
         widget.main_table.setColumnWidth(2, 200)
-        widget.main_table.setColumnWidth(3, 200)
-        widget.main_table.setColumnWidth(4, 180)
+        widget.main_table.setColumnWidth(3, 180)
 
     sys.exit(app.exec())
 
